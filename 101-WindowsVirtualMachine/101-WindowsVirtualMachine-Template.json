@@ -16,7 +16,7 @@
             }
         },
         "Password": {
-            "type": "securestring",
+            "type": "string",
             "metadata": {
                 "description": "Please define password for administrator account"
             }
