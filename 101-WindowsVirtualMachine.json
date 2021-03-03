@@ -1,0 +1,178 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Virtual Machine name": {
+            "type": "string",
+            "metadata": {
+                "description": "Please define virtual machine name"
+            }
+        },
+        "Username": {
+            "type": "string",
+            "defaultValue": "admin",
+            "metadata": {
+                "description": "Please define administrator name"
+            }
+        },
+        "Password": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Please define password for administrator account"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "VMName": "parameters('Virtual Machine name')",
+        "VMPublicIP": "[concat(parameters('Virtual Machine name'),'-PIP')]",
+        "VMNSG": "[concat(parameters('Virtual Machine name'),'-NSG')]",
+        "VMVNET": "[concat(parameters('Virtual Machine name'),'-vNET')]",
+        "VMSubnet": "[concat(variables('VMVNET'),'-SUBNET')]",
+        "VMVNIC": "[concat(parameters('Virtual Machine name'),'-vNIC')]",
+        "VMOSDISK": "[concat(parameters('Virtual Machine name'),'-OSDisk')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('VMPublicIP')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2019-11-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "PublicIPAddress"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[toLower(variables('VMName'))]"
+                }
+            }
+        },
+        {
+            "name": "[variables('VMNSG')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2018-08-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "RDP_Access",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('VMVNET')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2019-11-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('VMNSG'))]"
+            ],
+            "tags": {
+                "displayName": "[variables('VMVNET')]"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.254.10.0/24"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('VMSubnet')]",
+                        "properties": {
+                            "addressPrefix": "10.254.10.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('VMNSG'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('VMVNIC')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-11-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('VMPublicIP'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('VMVNET'))]"
+            ],
+            "tags": {
+                "displayName": "[concat(variables('VMName'),' Network Interface')]"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipConfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('VMPublicIP'))]"
+                            },
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'windowsVM1-VirtualNetwork', 'windowsVM1-VirtualNetwork-Subnet')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('VMName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('VMVNIC'))]"
+            ],
+            "tags": {
+                "displayName": "[variables('VMName')]"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_B2S"
+                },
+                "osProfile": {
+                    "computerName": "[variables('VMName')]",
+                    "adminUsername": "[parameters('Username')]",
+                    "adminPassword": "[parameters('Password')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "[variables('VMOSDISK')]",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('VMVNIC'))]"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
