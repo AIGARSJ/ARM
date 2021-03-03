@@ -9,7 +9,6 @@
             "value": "admin-aigars"
         },
         "Password": {
-            "type": "securestring",
             "value": "AJP@$$w0rd#123"
         }
     }
