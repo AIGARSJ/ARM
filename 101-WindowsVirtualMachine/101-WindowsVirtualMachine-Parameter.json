@@ -5,10 +5,10 @@
         "virtual machine name": {
             "value": "AJTESTVM123"
         },
-        "adminUsername": {
+        "Username": {
             "value": "admin-aigars"
         },
-        "adminPassword": {
+        "Password": {
             "value": "AJP@$$w0rd#123"
         }
     }
