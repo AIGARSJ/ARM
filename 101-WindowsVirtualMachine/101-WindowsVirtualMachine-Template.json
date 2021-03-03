@@ -24,7 +24,7 @@
     },
     "functions": [],
     "variables": {
-        "VMName": "parameters('Virtual Machine name')",
+        "VMName": "[parameters('Virtual Machine name')]",
         "VMPublicIP": "[concat(parameters('Virtual Machine name'),'-PIP')]",
         "VMNSG": "[concat(parameters('Virtual Machine name'),'-NSG')]",
         "VMVNET": "[concat(parameters('Virtual Machine name'),'-vNET')]",

@@ -5,12 +5,11 @@
         "virtual machine name": {
             "value": "AJTESTVM123"
         },
-        "username": {
+        "adminUsername": {
             "value": "admin-aigars"
         },
-        "password": {
-            "defaultValue": "AJP@$$w0rd#123",
-            "type": "SecureString"
+        "adminPassword": {
+            "value": "AJP@$$w0rd#123"
         }
     }
 }
