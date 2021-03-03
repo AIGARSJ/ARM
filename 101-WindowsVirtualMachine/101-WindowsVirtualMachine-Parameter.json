@@ -2,13 +2,14 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "Virtual Machine name": {
+        "VirtualMachineName": {
             "value": "AJTESTVM123"
         },
         "Username": {
             "value": "admin-aigars"
         },
         "Password": {
+            "type": "securestring",
             "value": "AJP@$$w0rd#123"
         }
     }

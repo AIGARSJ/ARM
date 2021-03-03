@@ -5,7 +5,7 @@
         "VirtualMachineName": {
             "type": "string",
             "metadata": {
-                "description": "Please define virtual machine name"
+                "description": "Please define Virtual Machine Name"
             }
         },
         "Username": {
@@ -16,7 +16,7 @@
             }
         },
         "Password": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "Please define password for administrator account"
             }
@@ -24,13 +24,13 @@
     },
     "functions": [],
     "variables": {
-        "VMName": "[parameters('Virtual Machine name')]",
-        "VMPublicIP": "[concat(parameters('Virtual Machine name'),'-PIP')]",
-        "VMNSG": "[concat(parameters('Virtual Machine name'),'-NSG')]",
-        "VMVNET": "[concat(parameters('Virtual Machine name'),'-vNET')]",
+        "VMName": "[parameters('VirtualMachineName')]",
+        "VMPublicIP": "[concat(parameters('VirtualMachineName'),'-PIP')]",
+        "VMNSG": "[concat(parameters('VirtualMachineName'),'-NSG')]",
+        "VMVNET": "[concat(parameters('VirtualMachineName'),'-vNET')]",
         "VMSubnet": "[concat(variables('VMVNET'),'-SUBNET')]",
-        "VMVNIC": "[concat(parameters('Virtual Machine name'),'-vNIC')]",
-        "VMOSDISK": "[concat(parameters('Virtual Machine name'),'-OSDisk')]"
+        "VMVNIC": "[concat(parameters('VirtualMachineName'),'-vNIC')]",
+        "VMOSDISK": "[concat(parameters('VirtualMachineName'),'-OSDisk')]"
     },
     "resources": [
         {
@@ -124,7 +124,7 @@
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('VMPublicIP'))]"
                             },
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'windowsVM1-VirtualNetwork', 'windowsVM1-VirtualNetwork-Subnet')]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('VMVNET'), variables('VMSubnet'))]"
                             }
                         }
                     }
