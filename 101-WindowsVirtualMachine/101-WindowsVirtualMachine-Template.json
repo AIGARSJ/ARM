@@ -27,6 +27,26 @@
             "metadata": {
                 "description": "Specify your own ip address"
             }
+        },
+        "Location": {
+            "type": "string",
+            "allowedValues":    [
+                "westeurope",
+                "northeurope"
+            ],
+            "metadata": {
+                "description": "Specify location for your resources"
+            }
+        },
+        "VM Size": {
+            "type": "string",
+            "allowedValues": [
+                "B2S_Standard",
+                "B4S_Standard"
+            ],
+            "metadata": {
+                "description": "Specity VM Size"
+            }
         }
     },
     "functions": [],
@@ -37,14 +57,15 @@
         "VMVNET": "[concat(parameters('VirtualMachineName'),'-vNET')]",
         "VMSubnet": "[concat(variables('VMVNET'),'-SUBNET')]",
         "VMVNIC": "[concat(parameters('VirtualMachineName'),'-vNIC')]",
-        "VMOSDISK": "[concat(parameters('VirtualMachineName'),'-OSDisk')]"
+        "VMOSDISK": "[concat(parameters('VirtualMachineName'),'-OSDisk')]",
+        "VMSize": "[parameters('VM Size')]"
     },
     "resources": [
         {
             "name": "[variables('VMPublicIP')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-11-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('Location')]",
             "tags": {
                 "displayName": "PublicIPAddress"
             },
@@ -58,8 +79,8 @@
         {
             "name": "[variables('VMNSG')]",
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2018-08-01",
-            "location": "[resourceGroup().location]",
+            "apiVersion": "2020-07-01",
+            "location": "[parameters('Location')]",
             "properties": {
                 "securityRules": [
                     {
@@ -82,8 +103,8 @@
         {
             "name": "[variables('VMVNET')]",
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2019-11-01",
-            "location": "[resourceGroup().location]",
+            "apiVersion": "2020-07-01",
+            "location": "[parameters('Location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('VMNSG'))]"
             ],
@@ -113,7 +134,7 @@
             "name": "[variables('VMVNIC')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-11-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('Location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', variables('VMPublicIP'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('VMVNET'))]"
@@ -142,7 +163,7 @@
             "name": "[variables('VMName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
-            "location": "[resourceGroup().location]",
+            "location": "[parameters('Location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('VMVNIC'))]"
             ],
@@ -151,7 +172,7 @@
             },
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "Standard_B2S"
+                    "vmSize": "[variables('VMSize')]"
                 },
                 "osProfile": {
                     "computerName": "[variables('VMName')]",
