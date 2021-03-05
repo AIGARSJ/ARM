@@ -66,9 +66,6 @@
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-11-01",
             "location": "[parameters('Location')]",
-            "tags": {
-                "displayName": "PublicIPAddress"
-            },
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
                 "dnsSettings": {
@@ -108,9 +105,6 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('VMNSG'))]"
             ],
-            "tags": {
-                "displayName": "[variables('VMVNET')]"
-            },
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -139,9 +133,6 @@
                 "[resourceId('Microsoft.Network/publicIPAddresses', variables('VMPublicIP'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks', variables('VMVNET'))]"
             ],
-            "tags": {
-                "displayName": "[concat(variables('VMName'),' Network Interface')]"
-            },
             "properties": {
                 "ipConfigurations": [
                     {
@@ -167,9 +158,6 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('VMVNIC'))]"
             ],
-            "tags": {
-                "displayName": "[variables('VMName')]"
-            },
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[variables('VMSize')]"
