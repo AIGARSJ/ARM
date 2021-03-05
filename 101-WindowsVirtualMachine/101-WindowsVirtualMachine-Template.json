@@ -41,8 +41,8 @@
         "VM Size": {
             "type": "string",
             "allowedValues": [
-                "B2S_Standard",
-                "B4S_Standard"
+                "Standard_B2s",
+                "Standard_B2ms"
             ],
             "metadata": {
                 "description": "Specity VM Size"
