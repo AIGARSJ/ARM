@@ -3,13 +3,16 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "VirtualMachineName": {
-            "value": "AJTESTVM123"
+            "value": "TESTVM123"
         },
         "Username": {
-            "value": "administrator"
+            "value": "Administrator"
         },
         "Password": {
-            "value": "AJP@$$w0rd#123"
+            "value": "P@$$w0rd#123"
+        },
+        "SourceIp": {
+            "value": "*"
         }
     }
 }
