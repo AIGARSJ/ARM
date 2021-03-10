@@ -1,0 +1,147 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ProjectName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specifies a project name that is used for generating resource names."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Specifies the location for all of the resources created by this template."
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Specifies the virtual machine administrator username."
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Specifies the virtual machine administrator password."
+            }
+        },
+        "VMSize": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_B2s",
+                "Standard_B2ms"
+            ],
+            "metadata": {
+                "description": "Size of the virtual machine"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "name": "VirtualNetwork",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/AIGARSJ/ARM/master/201-WindowsVirtualMachine/201-VirtualNetwork.json",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "ProjectName": {
+                        "value": "[parameters('ProjectName')]"
+                    },
+                    "Location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "NetworkAdapter",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments','VirtualNetwork')]",
+                "[resourceId('Microsoft.Resources/deployments','LoadBalancer')]" 
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/AIGARSJ/ARM/master/201-WindowsVirtualMachine/201-VirtualAdapter.json",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "ProjectName": {
+                        "value": "[parameters('ProjectName')]"
+                    },
+                    "Location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "VirtualMachine",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments','NetworkAdapter')]",
+                "[resourceId('Microsoft.Resources/deployments','VirtualNetwork')]",
+                "[resourceId('Microsoft.Resources/deployments','LoadBalancer')]"               
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/AIGARSJ/ARM/master/201-WindowsVirtualMachine/201-WindowsVirtualMachine.json",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "VirtualMachineName": {
+                        "value": "[parameters('ProjectName')]"
+                    },
+                    "Location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('adminPassword')]"
+                    },
+                    "VMSize": {
+                        "value": "[parameters('VMSize')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "LoadBalancer",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-10-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments','VirtualNetwork')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/AIGARSJ/ARM/master/201-WindowsVirtualMachine/201-AzureLoadBalancer.json",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "ProjectName": {
+                        "value": "[parameters('ProjectName')]"
+                    },
+                    "Location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
