@@ -43,6 +43,11 @@
                             {
                                 "id":"[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('LoadBalancerName'), variables('LoadBalancerBEName'))]"
                             }
+                            ],
+                            "loadBalancerInboundNatRules": [
+                                {
+                                "id":"[resourceId('Microsoft.Network/loadBalancers/inboundNatRules','Custom_RDP_Access')]"
+                                }
                             ]
                         }
                     }
