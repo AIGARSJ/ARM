@@ -28,9 +28,6 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-11-01",
             "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]"
-            ],
             "properties": {
                 "ipConfigurations": [
                     {
