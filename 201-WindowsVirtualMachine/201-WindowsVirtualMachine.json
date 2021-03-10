@@ -8,14 +8,14 @@
                 "description": "Please define Virtual Machine Name"
             }
         },
-        "Username": {
+        "adminUsername": {
             "type": "string",
             "defaultValue": "admin",
             "metadata": {
                 "description": "Please define administrator name"
             }
         },
-        "Password": {
+        "adminPassword": {
             "type": "securestring",
             "metadata": {
                 "description": "Please define password for administrator account"
@@ -56,8 +56,8 @@
                 },
                 "osProfile": {
                     "computerName": "[variables('VMName')]",
-                    "adminUsername": "[parameters('Username')]",
-                    "adminPassword": "[parameters('Password')]"
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
                 },
                 "storageProfile": {
                     "imageReference": {
