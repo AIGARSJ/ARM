@@ -43,12 +43,7 @@
                 ],
                 "backendAddressPools": [
                     {
-                        "name": "[variables('LoadBalancerBEName')]",
-                        "properties": {
-                            "virtualNetwork":{
-                                "id":"[resourceId('Microsoft.Network/VirtualNetwork',variables('vNetName'))]"
-                            }
-                        }
+                        "name": "[variables('LoadBalancerBEName')]"
                     }
                 ],
                 "inboundNatRules": [
