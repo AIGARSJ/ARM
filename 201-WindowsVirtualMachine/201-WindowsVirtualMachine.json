@@ -27,7 +27,7 @@
                 "description": "Specify location for your resources"
             }
         },
-        "VM Size": {
+        "VMSize": {
             "type": "string",
             "allowedValues": [
                 "Standard_B2s",
@@ -40,9 +40,8 @@
     },
     "functions": [],
     "variables": {
-        "VMName": "[parameters('VirtualMachineName')]",
+        "VMName": "[concat(parameters('VirtualMachineName'),'-VM')]",
         "VMOSDISK": "[concat(parameters('VirtualMachineName'),'-OSDisk')]",
-        "VMSize": "[parameters('VM Size')]",
         "VMVNIC": "[concat(parameters('VirtualMachineName'),'-vNIC')]"
     },
     "resources": [
@@ -53,7 +52,7 @@
             "location": "[parameters('Location')]",
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('VMSize')]"
+                    "vmSize": "[parameters('VMSize')]"
                 },
                 "osProfile": {
                     "computerName": "[variables('VMName')]",
