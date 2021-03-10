@@ -18,8 +18,7 @@
         "PublicIPName":         "[concat(parameters('ProjectName'),'-PIP')]",
         "LoadBalancerName":     "[concat(parameters('ProjectName'),'-LB')]",
         "LoadBalancerFEName":   "[concat(parameters('ProjectName'),'-FE')]",
-        "LoadBalancerBEName":   "[concat(parameters('ProjectName'),'-BE')]",
-        "vNetName":             "[concat(parameters('ProjectName'),'-vNET')]"
+        "LoadBalancerBEName":   "[concat(parameters('ProjectName'),'-BE')]"
     },
     "resources": [
         {
