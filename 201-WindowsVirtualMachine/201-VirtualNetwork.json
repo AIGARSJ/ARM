@@ -17,8 +17,8 @@
     },
     "functions": [],
     "variables": {
-        "vNetName": "[concat(parameters('ProjectName'),'-vNET')]",
-        "vNetSubnetName": "[concat(parameters('ProjectName'),'-SubNet')]"
+        "vNetName":         "[concat(parameters('ProjectName'),'-vNET')]",
+        "vNetSubnetName":   "[concat(parameters('ProjectName'),'-Subnet')]"
     },
     "resources": [
         {

@@ -40,9 +40,9 @@
     },
     "functions": [],
     "variables": {
-        "VMName": "[concat(parameters('VirtualMachineName'),'-VM')]",
+        "VMName":   "[concat(parameters('VirtualMachineName'),'-VM')]",
         "VMOSDISK": "[concat(parameters('VirtualMachineName'),'-OSDisk')]",
-        "VMVNIC": "[concat(parameters('VirtualMachineName'),'-vNIC')]"
+        "VMVNIC":   "[concat(parameters('VirtualMachineName'),'-vNIC')]"
     },
     "resources": [
         {

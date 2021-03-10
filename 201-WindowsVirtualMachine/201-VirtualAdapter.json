@@ -18,8 +18,8 @@
     "functions": [],
     "variables": {
         "NetworkInterface": "[concat(parameters('ProjectName'),'-vNIC')]",
-        "vNetName": "[concat(parameters('ProjectName'),'-vNET')]",
-        "vNetSubnetName": "[concat(parameters('ProjectName'),'-SubNet')]"
+        "vNetName":         "[concat(parameters('ProjectName'),'-vNET')]",
+        "vNetSubnetName":   "[concat(parameters('ProjectName'),'-SubNet')]"
     },
     "resources": [
         {

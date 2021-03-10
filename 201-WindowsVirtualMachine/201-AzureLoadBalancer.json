@@ -1,0 +1,81 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ProjectName": {
+            "type": "string"
+        },
+        "Location": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    
+    },
+    "functions": [],
+    "variables": {
+        "PublicIPName":         "[concat(parameters('ProjectName'),'-PIP')]",
+        "LoadBalancerName":     "[concat(parameters('ProjectName'),'-LB')]",
+        "LoadBalancerFEName":   "[concat(parameters('ProjectName'),'-FE')]",
+        "LoadBalancerBEName":   "[concat(parameters('ProjectName'),'-BE')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('LoadBalancerName')]",
+            "type": "Microsoft.Network/loadBalancers",
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('PublicIPName'))]"
+            ],
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "[variables('LoadBalancerFEName')]",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('PublicIPName'))]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "[variables('LoadBalancerBEName')]"
+                    }
+                ],
+                "inboundNatRules": [
+                    {
+                        "name": "RDP_Access",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('LoadBalancerName'), variables('LoadBalancerFEName'))]"
+                            },
+                            "protocol": "Tcp",
+                            "frontendPort": 45000,
+                            "backendPort": 3389,
+                            "enableFloatingIP": false
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('PublicIPName')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2019-11-01",
+            "location": "[variables('PublicIPName')]",
+            "tags": {
+                "displayName": "publicIPAddress1"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "dnsSettings": {
+                    "domainNameLabel": "[toLower(parameters('ProjectName'))]"
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
