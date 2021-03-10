@@ -65,7 +65,7 @@
             "name": "[variables('PublicIPName')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-11-01",
-            "location": "[variables('PublicIPName')]",
+            "location": "[parameters('Location')]",
             "tags": {
                 "displayName": "publicIPAddress1"
             },
