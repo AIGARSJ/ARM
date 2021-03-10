@@ -17,9 +17,11 @@
     },
     "functions": [],
     "variables": {
-        "NetworkInterface": "[concat(parameters('ProjectName'),'-vNIC')]",
-        "vNetName":         "[concat(parameters('ProjectName'),'-vNET')]",
-        "vNetSubnetName":   "[concat(parameters('ProjectName'),'-SubNet')]"
+        "NetworkInterface":     "[concat(parameters('ProjectName'),'-vNIC')]",
+        "vNetName":             "[concat(parameters('ProjectName'),'-vNET')]",
+        "vNetSubnetName":       "[concat(parameters('ProjectName'),'-SubNet')]",
+        "LoadBalancerName":     "[concat(parameters('ProjectName'),'-LB')]",
+        "LoadBalancerBEName":   "[concat(parameters('ProjectName'),'-BE')]"
     },
     "resources": [
         {
@@ -35,7 +37,13 @@
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('vNetSubnetName'))]"
+                            },
+                            //this will add network adapter to Load Balancer backend pool
+                            "loadBalancerBackendAddressPools":[
+                            {
+                                "id":"[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('LoadBalancerName'), variables('LoadBalancerBEName'))]"
                             }
+                            ]
                         }
                     }
                 ]

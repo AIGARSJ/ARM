@@ -18,9 +18,7 @@
     "functions": [],
     "variables": {
         "vNetName":             "[concat(parameters('ProjectName'),'-vNET')]",
-        "vNetSubnetName":       "[concat(parameters('ProjectName'),'-Subnet')]",
-        "LoadBalancerName":     "[concat(parameters('ProjectName'),'-LB')]",
-        "LoadBalancerBEName":   "[concat(parameters('ProjectName'),'-BE')]"
+        "vNetSubnetName":       "[concat(parameters('ProjectName'),'-Subnet')]"
     },
     "resources": [
         {
@@ -41,12 +39,6 @@
                             "addressPrefix": "10.254.0.0/24" 
                         }
                     }
-                ],
-                //this will add network adapter to Load Balancer backend pool
-                "loadBalancerBackendAddressPools":[
-                    {
-                    "id":"[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('LoadBalancerName'), variables('LoadBalancerBEName'))]"
-                }
                 ]
             }
         }
