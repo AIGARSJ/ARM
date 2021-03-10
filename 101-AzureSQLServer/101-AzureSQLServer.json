@@ -1,0 +1,87 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "Location": {
+            "type": "string",
+            "allowedValues":    [
+                "westeurope",
+                "northeurope"
+            ],
+            "metadata": {
+                "description": "Specify location for your resources"
+            }
+        },
+        "SQLServerName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specity SQL Server name"
+            }
+        },
+        "UserName": {
+            "type": "string",
+            "defaultValue": "sqladmin",
+            "metadata": {
+                "description": "Specify SQL Server admin account name"
+            }
+        },
+        "Password": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Specity SQL Server administrator account password"
+            }
+        },
+        "SourceIP": {
+            "type": "string",
+            "defaultValue": "0.0.0.0",
+            "metadata": {
+                "description": "Specity your own public ip"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "name": "[parameters('SQLServerName')]",
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2020-08-01-preview",
+            "location": "[parameters('Location')]",
+            "properties": {
+                "administratorLogin": "[parameters('UserName')]",
+                "administratorLoginPassword": "[parameters('Password')]",
+                "minimalTlsVersion":"1.2"
+            },
+            "resources": [
+                {
+                    "type": "firewallRules",
+                    "apiVersion": "2020-08-01-preview",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', parameters('SQLServerName'))]"
+                    ],
+                    "location": "[parameters('Location')]",
+                    "name": "ClientIP",
+                    "properties": {
+                        "startIpAddress": "[parameters('SourceIP')]",
+                        "endIpAddress": "[parameters('SourceIP')]"
+                    }
+                },
+                {
+                    "type": "firewallRules",
+                    "apiVersion": "2020-08-01-preview",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', parameters('SQLServerName'))]"
+                    ],
+                    "location": "[parameters('Location')]",
+                    "name": "AllowAzureServicesAccess",
+                    "properties": {
+                        "startIpAddress": "0.0.0.0",
+                        "endIpAddress": "0.0.0.0"
+                    }
+                }
+
+            ]
+        }
+    ],
+    "outputs": {}
+}

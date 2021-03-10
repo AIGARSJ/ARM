@@ -1,0 +1,47 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "SQLServerName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specity SQL Server name (globally unique)"
+            }
+        },
+        "DatabaseName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify database name"
+            }
+        },
+        "Location": {
+            "type": "string",
+            "allowedValues":    [
+                "westeurope",
+                "northeurope"
+            ],
+            "metadata": {
+                "description": "Specify location for your resources"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "DatabaseFullName": "[concat(parameters('SQLServerName'),'/',parameters('DatabaseName'))]"
+    },
+    "resources": [
+        {
+            "name": "[variables('DatabaseFullName')]",
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2020-08-01-preview",
+            "location": "[parameters('Location')]",
+            "sku": {
+                "name": "Basic"
+            },
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS"
+            }
+        }
+    ],
+    "outputs": {}
+}
