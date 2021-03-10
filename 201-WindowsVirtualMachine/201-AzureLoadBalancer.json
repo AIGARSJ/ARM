@@ -42,7 +42,10 @@
                 ],
                 "backendAddressPools": [
                     {
-                        "name": "[variables('LoadBalancerBEName')]"
+                        "name": "[variables('LoadBalancerBEName')]",
+                        "properties": {
+                            "virtualNetwork":"[concat(parameters('ProjectName'),'-vNET')]"
+                        }
                     }
                 ],
                 "inboundNatRules": [
