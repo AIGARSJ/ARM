@@ -18,7 +18,8 @@
         "PublicIPName":         "[concat(parameters('ProjectName'),'-PIP')]",
         "LoadBalancerName":     "[concat(parameters('ProjectName'),'-LB')]",
         "LoadBalancerFEName":   "[concat(parameters('ProjectName'),'-FE')]",
-        "LoadBalancerBEName":   "[concat(parameters('ProjectName'),'-BE')]"
+        "LoadBalancerBEName":   "[concat(parameters('ProjectName'),'-BE')]",
+        "vNetName":             "[concat(parameters('ProjectName'),'-vNET')]"
     },
     "resources": [
         {
@@ -44,7 +45,9 @@
                     {
                         "name": "[variables('LoadBalancerBEName')]",
                         "properties": {
-                            "virtualNetwork":"[concat(parameters('ProjectName'),'-vNET')]"
+                            "virtualNetwork":{
+                                "id":"[resourceId('Microsoft.Network/VirtualNetwork',variables('vNetName'))]"
+                            }
                         }
                     }
                 ],
