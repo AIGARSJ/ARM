@@ -46,7 +46,7 @@
                             ],
                             "loadBalancerInboundNatRules": [
                                 {
-                                "id":"[resourceId('Microsoft.Network/loadBalancers/inboundNatRules','Custom_RDP_Access')]"
+                                "id":"[resourceId('Microsoft.Network/loadBalancers/inboundNatRules',variables('LoadBalancerName'),'Custom_RDP_Access')]"
                                 }
                             ]
                         }
