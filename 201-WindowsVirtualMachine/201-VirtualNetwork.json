@@ -1,0 +1,48 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ProjectName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specifies a project name that is used for generating resource names."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Specifies the location for all of the resources created by this template."
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "vNetName": "[concat(parameters('ProjectName'),'-vNET')]",
+        "vNetSubnetName": "[concat(parameters('ProjectName'),'-SubNet')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('vNetName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.254.0.0/16"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('vNetSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "10.254.0.0/24"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {}
+}
