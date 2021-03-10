@@ -44,10 +44,11 @@
                                 "id":"[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('LoadBalancerName'), variables('LoadBalancerBEName'))]"
                             }
                             ],
+                            //this will map network adapter to NAT Custom RDP rule
                             "loadBalancerInboundNatRules": [
-                                {
-                                "id":"[resourceId('Microsoft.Network/loadBalancers/inboundNatRules',variables('LoadBalancerName'),'Custom_RDP_Access')]"
-                                }
+                            {
+                                "id":"[resourceId('Microsoft.Network/loadBalancers/inboundNatRules', variables('LoadBalancerName'),'Custom_RDP_Access')]"
+                            }
                             ]
                         }
                     }
