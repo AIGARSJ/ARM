@@ -47,7 +47,7 @@
                 ],
                 "inboundNatRules": [
                     {
-                        "name": "RDP_Access",
+                        "name": "Custom_RDP_Access",
                         "properties": {
                             "frontendIPConfiguration": {
                                 "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('LoadBalancerName'), variables('LoadBalancerFEName'))]"
@@ -66,9 +66,6 @@
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-11-01",
             "location": "[parameters('Location')]",
-            "tags": {
-                "displayName": "publicIPAddress1"
-            },
             "properties": {
                 "publicIPAllocationMethod": "Static",
                 "dnsSettings": {
