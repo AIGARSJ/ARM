@@ -42,7 +42,8 @@
     "variables": {
         "VMName":   "[concat(parameters('VirtualMachineName'),'-VM')]",
         "VMOSDISK": "[concat(parameters('VirtualMachineName'),'-OSDisk')]",
-        "VMVNIC":   "[concat(parameters('VirtualMachineName'),'-vNIC')]"
+        "VMVNIC":   "[concat(parameters('VirtualMachineName'),'-vNIC')]",
+        "AvailabilitySet": "[concat(parameters('VirtualMachineName'),'-AS')]"
     },
     "resources": [
         {
@@ -80,7 +81,7 @@
                     ]
                 },
                 "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/virtualMachines',variables('VMName'))]"
+                    "id": "[resourceId('Microsoft.Compute/virtualMachines',variables('AvailabilitySet'))]"
                 }
             }
         }

@@ -92,7 +92,8 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments','NetworkAdapter')]",
                 "[resourceId('Microsoft.Resources/deployments','VirtualNetwork')]",
-                "[resourceId('Microsoft.Resources/deployments','LoadBalancer')]"               
+                "[resourceId('Microsoft.Resources/deployments','LoadBalancer')]",
+                "[resourceId('Microsoft.Resources/deployments','AvailabilitySets')]"                            
             ],
             "properties": {
                 "mode": "Incremental",
@@ -146,9 +147,6 @@
             "name": "AvailabilitySets",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-10-01",
-            "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments','VirtualMachine')]"
-            ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
