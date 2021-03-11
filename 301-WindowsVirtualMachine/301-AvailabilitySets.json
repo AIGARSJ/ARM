@@ -17,8 +17,7 @@
     },
     "functions": [],
     "variables": {
-        "AvailabilitySets": "[concat(parameters('ProjectName'),'-AS')]",
-        "vmName":           "[concat(parameters('ProjectName'),'-VM')]"
+        "AvailabilitySets": "[concat(parameters('ProjectName'),'-AS')]"
     },
     "resources": [
         {
@@ -33,11 +32,7 @@
                 //Define update groups, per single time can be updated only 1 update group (max: 20)
                 "platformUpdateDomainCount": 2,
                 //Define physical servers, compute racks, storage units, and network switches count (max: 3)
-                "platformFaultDomainCount": 2,
-                "virtualMachines": [{
-                    "id":"[resourceid('Microsoft.Compute/virtualMachines',variables('vmName'))]"
-                }
-                ]
+                "platformFaultDomainCount": 2
             }
         }
     ],
