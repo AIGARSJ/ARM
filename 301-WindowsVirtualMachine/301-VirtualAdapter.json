@@ -1,0 +1,60 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ProjectName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specifies a project name that is used for generating resource names."
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Specifies the location for all of the resources created by this template."
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "NetworkInterface":     "[concat(parameters('ProjectName'),'-vNIC')]",
+        "vNetName":             "[concat(parameters('ProjectName'),'-vNET')]",
+        "vNetSubnetName":       "[concat(parameters('ProjectName'),'-SubNet')]",
+        "LoadBalancerName":     "[concat(parameters('ProjectName'),'-LB')]",
+        "LoadBalancerBEName":   "[concat(parameters('ProjectName'),'-BE')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('NetworkInterface')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipConfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('vNetSubnetName'))]"
+                            },
+                            //this will add network adapter to Load Balancer backend pool
+                            "loadBalancerBackendAddressPools":[
+                            {
+                                "id":"[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('LoadBalancerName'), variables('LoadBalancerBEName'))]"
+                            }
+                            ],
+                            //this will map network adapter to NAT Custom RDP rule
+                            "loadBalancerInboundNatRules": [
+                            {
+                                "id":"[resourceId('Microsoft.Network/loadBalancers/inboundNatRules', variables('LoadBalancerName'),'Custom_RDP_Access')]"
+                            }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {}
+}
