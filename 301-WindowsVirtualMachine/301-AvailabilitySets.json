@@ -1,0 +1,41 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ProjectName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "Location": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "AvailabilitySets": "[concat(parameters('ProjectName'),'-AS')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('AvailabilitySets')]",
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('Location')]",
+            "sku": {
+                "name": "Aligned"
+            },
+            "properties": {
+                //Define update groups, per single time can be updated only 1 update group (max: 20)
+                "platformUpdateDomainCount": 2,
+                //Define physical servers, compute racks, storage units, and network switches count (max: 3)
+                "platformFaultDomainCount": 2,
+                "virtualMachines": "[concat(parameters('ProjectName'),'-VM')]"
+            }
+        }
+    ],
+    "outputs": {}
+}
