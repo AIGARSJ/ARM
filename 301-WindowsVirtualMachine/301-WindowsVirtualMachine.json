@@ -81,7 +81,7 @@
                     ]
                 },
                 "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/virtualMachines',variables('AvailabilitySet'))]"
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('AvailabilitySet'))]"
                 }
             }
         }
