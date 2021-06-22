@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "SQLServerName": {
+            "value": "AJTESTSQL123"
+        },
+        "UserName": {
+            "value": "sqladmin"
+        },
+        "Location": {
+            "value": "westeurope"
+        },
+        "Password": {
+            "value": "AJP@$$W0rd123#" // TODO: Fill in parameter value
+        },
+        "SourceIP": {
+            "value": "93.177.211.94"
+        }
+    }
+}

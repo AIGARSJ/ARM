@@ -1,0 +1,129 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ProjectName": {
+            "type": "string",
+            "metadata": {
+                "description": "Please define Virtual Machine Name"
+            }
+        },
+        "Username": {
+            "type": "string",
+            "defaultValue": "aigars",
+            "metadata": {
+                "description": "Please define administrator name"
+            }
+        },
+        "Password": {
+            "type": "securestring",
+            "defaultValue": "P@^^^W0rd!@#123",
+            "metadata": {
+                "description": "Please define password for administrator account"
+            }
+        },
+        "Location": {
+            "type": "string",
+            "allowedValues":    [
+                "westeurope"
+            ],
+            "metadata": {
+                "description": "Specify location for your resources"
+            }
+        },
+        "VM Size": {
+            "type": "string",
+            "defaultValue": "Standard_B1ls",
+            "allowedValues": [
+                "Standard_B1ls"
+            ],
+            "metadata": {
+                "description": "Specity VM Size"
+            }
+        },
+        "Daudzums": {
+            "type": "int",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "VMName": "[parameters('ProjectName')]",
+        "VMVNIC": "[concat(parameters('ProjectName'),'-vNIC')]",
+        "VMOSDISK": "[concat(parameters('ProjectName'),'-OSDisk')]",
+        "VMSize": "[parameters('VM Size')]",
+        "VNET": "[concat(parameters('ProjectName'),'-vNET')]",
+        "SUBNET": "[concat(parameters('ProjectName'),'-SUBNET')]"
+    },
+    "resources": [
+        {
+            "name": "[concat(variables('VMVNIC'),'-',copyindex(1))]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('Location')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipConfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('VNET'), variables('SUBNET'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "multiplynics",
+                "count": "[parameters('Daudzums')]"
+            }
+        },
+        {
+            "name": "[concat(variables('VMName'),'-',copyIndex(1))]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('VMVNIC'),'-',copyindex(1)))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('VMSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(variables('VMName'),'-',copyIndex(1))]",
+                    "adminUsername": "[parameters('Username')]",
+                    "adminPassword": "[parameters('Password')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "16.04-LTS",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "[concat(variables('VMOSDISK'),'-',copyIndex(1))]",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('VMVNIC'),'-',copyindex(1)))]"
+                        }
+                    ]
+                }
+            },
+            "copy": {
+                "name": "multiplyvms",
+                "count": "[parameters('Daudzums')]"
+            }
+        }
+    ],
+    "outputs": {}
+}

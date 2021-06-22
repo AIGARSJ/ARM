@@ -1,0 +1,291 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ProjectName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "today": {
+            "type": "string",
+            "defaultValue": "[utcNow('yyyy-MM-dd')]",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "Location": {
+            "type": "string",
+            "allowedValues": [
+                "westeurope"
+            ],
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "AutomationAccount": "[concat(parameters('ProjectName'),'-test-westeu-aa')]",
+        "RunBook1": "[concat('restorebak',      '-test-westeu-runbook')]",
+        "RunBook2": "[concat('remounttenants',  '-test-westeu-runbook')]",
+        "ScheduleName": "DailySchedule",
+        "ScheduleJobID": "[guid(resourceId('Microsoft.Automation/automationAccounts/schedules',variables('AutomationAccount'),variables('ScheduleName')))]",
+        "AzSQLModule": "[concat(variables('AutomationAccount'),              '/Az.Sql')]",
+        "AzAccountsModule": "[concat(variables('AutomationAccount'),         '/Az.Accounts')]",
+        "AzResourcesModule": "[concat(variables('AutomationAccount'),        '/Az.Resources')]",
+        "AzAutomationModule": "[concat(variables('AutomationAccount'),       '/Az.Automation')]",
+        "AzAccountID": "[concat(resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount')),'/modules/Az.Accounts')]",
+        "Databases":"TESTDB",
+        "LockName": "Delete_Lock",
+        "ScriptLocation":"https://scriptlocation.com",
+        "AzureSQLName":"TESTSQL",
+        "VMName": "TESTVM1",
+        "UTCTime": "[dateTimeAdd(parameters('today'),'P0Y0M1DT0H0M0S')]",
+        "LatvianTime": "[dateTimeAdd(variables('UTCTime'),'-P0Y0M0DT1H0M0S')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('AutomationAccount')]",
+            "type": "Microsoft.Automation/automationAccounts",
+            "apiVersion": "2019-06-01",
+            "location": "[parameters('Location')]",
+            "properties": {
+                "sku": {
+                    "name": "Basic"
+                }
+            }
+        },
+        //Import PowerShell RunBooks
+        {
+            "name": "[concat(variables('AutomationAccount'),'/',variables('RunBook1'))]",
+            "type": "Microsoft.Automation/automationAccounts/runbooks",
+            "apiVersion": "2019-06-01",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]"
+            ],
+            "properties": {
+                "logVerbose": true,
+                "logProgress": true,
+                "runbookType": "PowerShell",
+                "publishContentLink": {
+                    "uri": "https://raw.githubusercontent.com/AIGARSJ/ARM/master/Runbooks/RestoreBAK.ps1",
+                    "version": "1.0.0.0"
+                },
+                "description": "description"
+            }
+        },
+        //Import necessary modules
+        {
+            "name": "[concat(variables('AutomationAccount'),'/',variables('RunBook2'))]",
+            "type": "Microsoft.Automation/automationAccounts/runbooks",
+            "apiVersion": "2019-06-01",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]"
+            ],
+            "properties": {
+                "logVerbose": true,
+                "logProgress": true,
+                "runbookType": "PowerShell",
+                "publishContentLink": {
+                    "uri": "https://raw.githubusercontent.com/AIGARSJ/ARM/master/Runbooks/RemountTenants.ps1",
+                    "version": "1.0.0.0"
+                },
+                "description": "description"
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[variables('AzAccountsModule')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]"
+            ],
+            "properties": {
+                "contentLink": {
+                    "uri": "https://psg-prod-eastus.azureedge.net/packages/az.accounts.2.2.7.nupkg"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[variables('AzAutomationModule')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]",
+                "[variables('AzAccountID')]"
+            ],
+            "properties": {
+                "contentLink": {
+                    "uri": "https://psg-prod-eastus.azureedge.net/packages/az.automation.1.5.2.nupkg"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[variables('AzResourcesModule')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]",
+                "[variables('AzAccountID')]"
+            ],
+            "properties": {
+                "contentLink": {
+                    "uri": "https://psg-prod-eastus.azureedge.net/packages/az.resources.3.4.0.nupkg"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/modules",
+            "apiVersion": "2015-10-31",
+            "name": "[variables('AzSQLModule')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]",
+                "[variables('AzAccountID')]"
+            ],
+            "properties": {
+                "contentLink": {
+                    "uri": "https://psg-prod-eastus.azureedge.net/packages/az.sql.2.17.0.nupkg"
+                }
+            }
+        },
+        //Create and define variables
+        {
+            "type": "Microsoft.Automation/automationAccounts/variables",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(variables('AutomationAccount'), '/AutomationAccountName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]"
+            ],
+            "properties": {
+                "isEncrypted": false,
+                "value": "[concat('\"',variables('AutomationAccount'),'\"')]"
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/variables",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(variables('AutomationAccount'), '/Database')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]"
+            ],
+            "properties": {
+                "isEncrypted": false,
+                "value": "[concat('\"',variables('Databases'),'\"')]"
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/variables",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(variables('AutomationAccount'), '/LockName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]"
+            ],
+            "properties": {
+                "isEncrypted": false,
+                "value": "[concat('\"',variables('LockName'),'\"')]"
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/variables",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(variables('AutomationAccount'), '/ResourceGroup')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]"
+            ],
+            "properties": {
+                "isEncrypted": false,
+                "value": "[concat('\"',resourceGroup().name,'\"')]"
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/variables",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(variables('AutomationAccount'), '/RunbookName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]"
+            ],
+            "properties": {
+                "isEncrypted": false,
+                "value": "[concat('\"',variables('RunBook2'),'\"')]"
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/variables",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(variables('AutomationAccount'), '/SQLServer')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]"
+            ],
+            "properties": {
+                "isEncrypted": false,
+                "value": "[concat('\"',variables('AzureSQLName'),'\"')]"
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/variables",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(variables('AutomationAccount'), '/URI')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]"
+            ],
+            "properties": {
+                "isEncrypted": false,
+                "value": "[concat('\"',variables('ScriptLocation'),'\"')]"
+            }
+        },
+        {
+            "type": "Microsoft.Automation/automationAccounts/variables",
+            "apiVersion": "2015-10-31",
+            "name": "[concat(variables('AutomationAccount'), '/VMName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]"
+            ],
+            "properties": {
+                "isEncrypted": false,
+                "value": "[concat('\"',variables('VMName'),'\"')]"
+            }
+        },
+        //Create schedule and setup it
+        {
+            "name": "[concat(variables('AutomationAccount'), '/',variables('ScheduleName'))]",
+            "type": "Microsoft.Automation/automationAccounts/schedules",
+            "apiVersion": "2015-10-31",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]"
+            ],
+            "properties": {
+                "startTime":  "[variables('LatvianTime')]",
+                "expiryTime": "9999-12-31T23:59:00+02:00",
+                "interval": 1,
+                "frequency": "Day",
+                "timeZone": "Europe/Riga"
+            }
+        },
+        //Map schedule and runbook together
+        {
+            "name": "[concat(variables('AutomationAccount'), '/',variables('ScheduleJobID'))]",
+            "type": "Microsoft.Automation/automationAccounts/jobSchedules",
+            "apiVersion": "2015-10-31",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccount'))]",
+                "[resourceId('Microsoft.Automation/automationAccounts/schedules',variables('AutomationAccount'),variables('ScheduleName'))]",
+                "[resourceId('Microsoft.Automation/automationAccounts/runbooks',variables('AutomationAccount'),variables('RunBook1'))]"
+            ],
+            "properties": {
+                "schedule": {
+                    "name": "[variables('ScheduleName')]"
+                },
+                "runbook": {
+                    "name": "[variables('RunBook1')]"
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

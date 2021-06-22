@@ -1,0 +1,26 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ProjectName": {
+            "value": "bc365-v18-demo"
+        },
+        "VirtualAdapter": {
+            "value": "bc365-v18-demo-westeu-vnic"
+        },
+        "VMSize": {
+            "value": "Standard_D2s_v3" // TODO: Fill in parameter value
+        },
+        "username": {
+            "value": "admin-hortus" // TODO: Fill in parameter value
+        },
+        "Password": {
+            "reference": {
+                "keyVault":{
+                    "id": "/subscriptions/07358cec-7b2a-42cc-9b18-d33a05f2262c/resourceGroups/mgmt-prod-westeu-rg/providers/Microsoft.KeyVault/vaults/mgmt-prod-westeu-kv"
+                },
+                "secretName": "vmAdminPassword"
+            }
+          },
+    }
+}

@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ProjectName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specifies a project name that is used for generating resource names."
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Specifies the location for all of the resources created by this template."
+            }
+        },
+        "VirtualNetwork": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "VirtualNetworkSubnet": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "NetworkInterface":     "[concat(parameters('ProjectName'),'-vnic')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('NetworkInterface')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipConfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetwork'), parameters('VirtualNetworkSubnet'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {}
+}

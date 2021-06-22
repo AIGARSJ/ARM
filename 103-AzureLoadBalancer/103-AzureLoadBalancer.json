@@ -18,11 +18,13 @@
     },
     "functions": [],
     "variables": {
-        "LoadBalancerName":     "[concat(parameters('Load Balancer Name'),'-LB')]",
-        "PublicIPName":         "[concat(parameters('Load Balancer Name'),'-PIP')]",
-        "LoadBalancerFEName":   "[concat(parameters('Load Balancer Name'),'-FE')]",
-        "LoadBalancerBEName":   "[concat(parameters('Load Balancer Name'),'-BE')]"
-    },
+        "LoadBalancerName": "[concat(parameters('Load Balancer Name'),'-LB')]",
+        "PublicIPName": "[concat(parameters('Load Balancer Name'),'-PIP')]",
+        "LoadBalancerFEName": "[concat(parameters('Load Balancer Name'),'-FE')]",
+        "LoadBalancerBEName": "[concat(parameters('Load Balancer Name'),'-BE')]",
+        "LoadBalancerRuleNameHTTP": "[concat(parameters('Load Balancer Name'),'-LBR-HTTP')]",
+        "LoadBalancerHealthProbeNameHTTP": "[concat(parameters('Load Balancer Name'),'-HP-HTTP')]"
+    },  
     "resources": [
         {
             "name": "[variables('LoadBalancerName')]",
@@ -59,6 +61,37 @@
                             "frontendPort": 45000,
                             "backendPort": 3389,
                             "enableFloatingIP": false
+                        }
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "[variables('LoadBalancerRuleNameHTTP')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                               "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('LoadBalancerName'), variables('LoadBalancerFEName'))]"
+                            },
+                            "protocol": "Tcp",
+                            "frontendPort": "80",
+                            "backendPort": "80",
+                            "backendAddressPool": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools',variables('LoadBalancerName'),variables('LoadBalancerBEName'))]"
+                            },
+                            "probe": {
+                                "id": "[resourceId('Microsoft.Network/loadBalancers/Probes',variables('LoadBalancerName'),variables('LoadBalancerHealthProbeNameHTTP'))]"
+                            }
+                        }
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "[variables('LoadBalancerHealthProbeNameHTTP')]",
+                        "properties": {
+                            "protocol": "http",
+                            "intervalInSeconds": "15",
+                            "numberOfProbes": "1",
+                            "port": "80",
+                            "requestPath": "/"
                         }
                     }
                 ]

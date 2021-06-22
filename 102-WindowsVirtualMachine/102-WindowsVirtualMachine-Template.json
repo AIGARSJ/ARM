@@ -1,0 +1,155 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "VirtualMachineName": {
+            "type": "string",
+            "metadata": {
+                "description": "Please define Virtual Machine Name"
+            }
+        },
+        "Username": {
+            "type": "string",
+            "defaultValue": "admin",
+            "metadata": {
+                "description": "Please define administrator name"
+            }
+        },
+        "Password": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Please define password for administrator account"
+            }
+        },
+        "SourceIP": {
+            "type": "string",
+            "defaultValue": "*",
+            "metadata": {
+                "description": "Specify your own ip address"
+            }
+        },
+        "Location": {
+            "type": "string",
+            "allowedValues":    [
+                "westeurope",
+                "northeurope"
+            ],
+            "metadata": {
+                "description": "Specify location for your resources"
+            }
+        },
+        "VM Size": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_B2s",
+                "Standard_B2ms"
+            ],
+            "metadata": {
+                "description": "Specity VM Size"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "VMName": "[parameters('VirtualMachineName')]",
+        "VMNSG": "[concat(parameters('VirtualMachineName'),'-NSG')]",
+        "VMVNET": "[concat(parameters('VirtualMachineName'),'-vNET')]",
+        "VMSubnet": "[concat(variables('VMVNET'),'-SUBNET')]",
+        "VMVNIC": "[concat(parameters('VirtualMachineName'),'-vNIC')]",
+        "VMOSDISK": "[concat(parameters('VirtualMachineName'),'-OSDisk')]",
+        "VMSize": "[parameters('VM Size')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('VMNSG')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-07-01",
+            "location": "[parameters('Location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "RDP_Access",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "[parameters('SourceIP')]",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('VMVNET')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-07-01",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('VMNSG'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.254.10.0/24"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('VMSubnet')]",
+                        "properties": {
+                            "addressPrefix": "10.254.10.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('VMNSG'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('VMName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('Location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('VMVNIC'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('VMSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[variables('VMName')]",
+                    "adminUsername": "[parameters('Username')]",
+                    "adminPassword": "[parameters('Password')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-Datacenter-smalldisk",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "[variables('VMOSDISK')]",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('VMVNIC'))]"
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

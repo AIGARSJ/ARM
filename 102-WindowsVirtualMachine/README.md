@@ -1,0 +1,1 @@
+This ARM template will create Virtual Machine will virtual network without Public IP.

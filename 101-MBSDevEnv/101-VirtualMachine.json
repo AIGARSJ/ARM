@@ -1,0 +1,76 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ProjectName": {
+            "type": "String"
+        },
+        "VirtualAdapter": {
+            "type": "String"
+        },
+        "VMSize": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "username": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "password": {
+            "type": "securestring",
+            "metadata": {
+                "description": "description"
+            }
+        }
+    },
+    "variables": {
+        "VirtualMachine": "[concat(parameters('ProjectName'),'-westeu-vm')]",
+        "osdisk": "[concat(parameters('ProjectName'),'-westeu-osdisk')]",
+        "computername": "[replace(parameters('ProjectName'),'-','')]"
+    },
+    "resources": [
+        {
+            "name": "[variables('VirtualMachine')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-07-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('VMSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[variables('computername')]",
+                    "adminUsername": "[parameters('Username')]",
+                    "adminPassword": "[parameters('Password')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "[variables('osdisk')]",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "StandardSSD_LRS"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('VirtualAdapter'))]"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

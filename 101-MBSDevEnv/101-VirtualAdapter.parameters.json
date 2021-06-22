@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ProjectName": {
+            "value": "bc365-v18-demo-westeu"
+        },
+        "location": {
+            "value": "westeurope"
+        },
+        "VirtualNetwork": {
+            "value": "bc365-demo-westeu-vnet"
+        },
+        "VirtualNetworkSubnet": {
+            "value": "bc365-v18-demo-westeu-sub"
+        }
+    }
+}

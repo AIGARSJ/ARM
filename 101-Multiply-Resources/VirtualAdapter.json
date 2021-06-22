@@ -13,19 +13,23 @@
             "metadata": {
                 "description": "Specifies the location for all of the resources created by this template."
             }
+        },
+        "Daudzums": {
+            "type": "int",
+            "metadata": {
+                "description": "description"
+            }
         }
     },
     "functions": [],
     "variables": {
-        "NetworkInterface":     "[concat(parameters('ProjectName'),'-vnic')]",
-        "vNetName":             "[concat(parameters('ProjectName'),'-vnet')]",
-        "vNetSubnetName":       "[concat(parameters('ProjectName'),'-subnet')]",
-        "LoadBalancerName":     "[concat(parameters('ProjectName'),'-lb')]",
-        "LoadBalancerBEName":   "[concat(parameters('ProjectName'),'-be')]"
+        "NetworkInterface":     "[concat(parameters('ProjectName'),'-vNIC')]",
+        "vNetName":             "[concat(parameters('ProjectName'),'-vNET')]",
+        "vNetSubnetName":       "[concat(parameters('ProjectName'),'-SubNet')]"
     },
     "resources": [
         {
-            "name": "[variables('NetworkInterface')]",
+            "name": "[concat(variables('NetworkInterface'),'-',copyIndex())]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-11-01",
             "location": "[parameters('location')]",
@@ -37,22 +41,15 @@
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('vNetSubnetName'))]"
-                            },
-                            //this will add network adapter to Load Balancer backend pool
-                            "loadBalancerBackendAddressPools":[
-                            {
-                                "id":"[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('LoadBalancerName'), variables('LoadBalancerBEName'))]"
                             }
-                            ],
-                            //this will map network adapter to NAT Custom RDP rule
-                            "loadBalancerInboundNatRules": [
-                            {
-                                "id":"[resourceId('Microsoft.Network/loadBalancers/inboundNatRules', variables('LoadBalancerName'),'Custom_RDP_Access')]"
-                            }
-                            ]
                         }
                     }
                 ]
+            },
+            "copy": {
+                "name": "copy-vnics",
+                "count": "[parameters('Daudzums')]",
+                "mode": "Parallel"
             }
         }
     ],
